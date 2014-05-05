@@ -78,6 +78,22 @@
 	}
 }
 
+- (void)setImageStyle:(PKViewImageStyle)imageStyle
+{
+    _imageStyle = imageStyle;
+    
+    NSString *placeholderImageName = @"placeholder";
+    if (imageStyle == PKViewImageStyleOutline) {
+		placeholderImageName = [NSString stringWithFormat:@"%@-outline", placeholderImageName];
+        self.lineView.hidden = YES;
+	}
+    else {
+        self.lineView.hidden = NO;
+    }
+    
+    _placeholderView.image = [UIImage imageNamed:placeholderImageName];
+}
+
 - (void)setDefaultTextAttributes:(NSDictionary *)defaultTextAttributes
 {
 	_defaultTextAttributes = [defaultTextAttributes copy];
@@ -156,11 +172,9 @@
     [self addSubview:self.innerView];
     [self addSubview:_placeholderView];
     
-	if (self.imageStyle == PKViewImageStyleNormal) {
-		UIView *line = [[UIView alloc] initWithFrame:CGRectMake(_placeholderView.frame.size.width - 0.5, 0, 0.5,  _innerView.frame.size.height)];
-		line.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3];
-		[self addSubview:line];
-	}
+    self.lineView = [[UIView alloc] initWithFrame:CGRectMake(_placeholderView.frame.size.width - 0.5, 0, 0.5,  _innerView.frame.size.height)];
+    self.lineView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.3];
+    [self addSubview:self.lineView];
 	
     [self stateCardNumber];
 }
@@ -180,7 +194,12 @@
 
 - (void)setupPlaceholderView
 {
-    _placeholderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"placeholder"]];
+    NSString *placeholderImageName = @"placeholder";
+    if (self.imageStyle == PKViewImageStyleOutline) {
+		placeholderImageName = [NSString stringWithFormat:@"%@-outline", placeholderImageName];
+	}
+    
+    _placeholderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:placeholderImageName]];
 	_placeholderView.backgroundColor = [UIColor whiteColor];
 }
 
@@ -276,25 +295,25 @@
 	
 	CGFloat lastGroupSidePadding = (newLastGroupWidth - lastGroupSize.width) / 2.0;
 	
-	  _cardNumberField.frame = CGRectMake((innerWidth / 2.0) - (cardNumberSize.width / 2.0),
-										  textFieldY,
-										  cardNumberSize.width,
-										  cardNumberSize.height);
+    _cardNumberField.frame = CGRectMake((innerWidth / 2.0) - (cardNumberSize.width / 2.0),
+                                        textFieldY,
+                                        cardNumberSize.width,
+                                        cardNumberSize.height);
 	
 	_cardLastFourField.frame = CGRectMake(CGRectGetMaxX(_cardNumberField.frame) - lastGroupSize.width,
 										  textFieldY,
 										  lastGroupSize.width,
 										  lastGroupSize.height);
 	
-	  _cardExpiryField.frame = CGRectMake(CGRectGetMaxX(_cardNumberField.frame) + lastGroupSidePadding,
-										  textFieldY,
-										  newExpiryWidth,
-										  expirySize.height);
-
-	     _cardCVCField.frame = CGRectMake(CGRectGetMaxX(_cardExpiryField.frame),
-										  textFieldY,
-										  newCVCWidth,
-										  cvcSize.height);
+    _cardExpiryField.frame = CGRectMake(CGRectGetMaxX(_cardNumberField.frame) + lastGroupSidePadding,
+                                        textFieldY,
+                                        newExpiryWidth,
+                                        expirySize.height);
+    
+    _cardCVCField.frame = CGRectMake(CGRectGetMaxX(_cardExpiryField.frame),
+                                     textFieldY,
+                                     newCVCWidth,
+                                     cvcSize.height);
 	
 	CGFloat x;
 	
@@ -305,10 +324,10 @@
 		x = _innerView.frame.origin.x;
 	}
 	
-	        _innerView.frame = CGRectMake(x,
-										  0.0,
-										  CGRectGetMaxX(_cardCVCField.frame),
-										  self.frame.size.height);
+    _innerView.frame = CGRectMake(x,
+                                  0.0,
+                                  CGRectGetMaxX(_cardCVCField.frame),
+                                  self.frame.size.height);
 }
 
 // State
@@ -461,6 +480,8 @@
     
     if (cardType == PKCardTypeAmex) {
         [self setPlaceholderViewImage:[UIImage imageNamed:@"cvc-amex"]];
+    } else if (self.imageStyle == PKViewImageStyleOutline) {
+        [self setPlaceholderViewImage:[UIImage imageNamed:@"cvc-outline"]];
     } else {
         [self setPlaceholderViewImage:[UIImage imageNamed:@"cvc"]];
     }

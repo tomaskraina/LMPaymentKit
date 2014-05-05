@@ -51,6 +51,7 @@ typedef enum {
 
 @property UIView *innerView;
 @property UIView *clipView;
+@property UIView *lineView;
 @property PKTextField *cardNumberField;
 @property UITextField *cardLastFourField;
 @property PKTextField *cardExpiryField;
